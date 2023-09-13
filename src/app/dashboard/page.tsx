@@ -1,33 +1,21 @@
 'use client'
-import { Button } from "@/components/ui/button";
-import { Github, FileVideo, Upload, Wand2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Button } from "../../components/ui/button";
+import { FileVideo, Upload, Wand2 } from "lucide-react";
+import { Separator } from "../../components/ui/separator";
+import { Textarea } from "../../components/ui/textarea";
+import { Label } from "../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+} from "../../components/ui/select";
+import { Slider } from "../../components/ui/slider";
 
 export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="px-6 py-3 flex items-center justify-between border-b">
-        <h1 className="text-xl">upload.ai</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            Desenvolvido com 💜 no NLW da Rocketseat
-          </span>
-          <Separator orientation="vertical" className="h-6" />
-          <Button variant="outline">
-            <Github className="w-4 h-4 mr-2" /> Github
-          </Button>
-        </div>
-      </div>
       <main className="flex flex-1 p-6 gap-6">
         <div className="flex flex-col flex-1 gap-4">
           <div className="grid grid-row-2 gap-4 flex-1">
@@ -38,7 +26,7 @@ export default function Dashboard() {
             <Textarea
               className="resize-none p-4 leading-relaxed"
               placeholder="Resultado gerado pela IA."
-              read-only
+              readOnly
             />
           </div>
           <p className="text-sm text-muted-foreground">

@@ -1,5 +1,5 @@
 "use client";
-import LogoutBtn from "@/components/logout-btn";
+import LogoutBtn from "../../components/logout-btn";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

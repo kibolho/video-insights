@@ -2,10 +2,10 @@
 import { useSession, signIn } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button, buttonVariants } from "./ui/button";
+import { cn } from "@/lib/utils";
 
-const baseBtnStyle ="bg-slate-100 hover:bg-slate-200 text-black px-6 py-2 rounded-md capitalize font-bold mt-1";
-
-export default function LoginBtn() {
+export default function LoginBtn({ absolute = false, label="Sign In"}) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -25,12 +25,15 @@ export default function LoginBtn() {
   if (status === "unauthenticated") {
     return (
       <>
-        <button
-          className={baseBtnStyle}
+        <Button
+          className={
+            absolute ? "absolute right-4 top-4 md:right-8 md:top-8" : ""
+          }
+          variant={absolute ? "ghost" : undefined}
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
         >
-          Sign in
-        </button>
+          {label}
+        </Button>
       </>
     );
   }
