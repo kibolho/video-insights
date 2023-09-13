@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       },
     ],
-    success_url: process.env.NEXT_PUBLIC_WEBSITE_URL + `?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  process.env.NEXT_PUBLIC_WEBSITE_URL,
+    success_url: process.env.NEXT_PUBLIC_VERCEL_URL + `?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  process.env.NEXT_PUBLIC_VERCEL_URL,
     subscription_data: {
       metadata: {
         // so that we can manually check in Stripe for whether a customer has an active subscription later, or if our webhook integration breaks.

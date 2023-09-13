@@ -41,7 +41,7 @@ const products = [
           "Appointment status updates",
           "Appointment history tracking and filtering",
         ],
-        active: false,
+        active: true,
       },
     ],
   },
@@ -87,7 +87,7 @@ const products = [
           "Appointment status updates",
           "Appointment history tracking and filtering",
         ],
-        active: false,
+        active: true,
       },
     ],
   },
@@ -117,7 +117,7 @@ export function ProductCard({
           selectedPlan.plan === product.productId
             ? "-translate-y-2"
             : "hover:-translate-y-2"
-        } transition-all w-full max-w-[21rem] min-h-[22rem] bg-black`}
+        } transition-all w-full max-w-[21rem] min-h-[22rem] bg-black border-neutral-400 text-neutral-400 `}
         onClick={() => selectedPlan.setPlan(product.productId)}
       >
         <div className="font-bold text-3xl mb-2 capitalize">
@@ -140,8 +140,10 @@ export function ProductCard({
       className={`p-10 border-2 border-neutral-400 text-neutral-400 w-full max-w-[21rem] min-h-[22rem] bg-black`}
     >
       <div className="font-bold text-3xl mb-2 capitalize">
-        {product.name} Plan
       </div>
+      <span className="text-sm text-muted-foreground">
+        {product.name} Plan
+      </span>
       <div className="flex items-baseline mb-2">
         <div className="text-3xl mr-2">${product.price}</div> Per {product.type}
       </div>

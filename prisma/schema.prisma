@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
+  provider     = "postgresql"
+  url          = env("POSTGRES_PRISMA_URL")
+  directUrl    = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   relationMode = "prisma"
 }
 
@@ -17,12 +18,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -41,6 +42,27 @@ model Session {
   @@index([userId])
 }
 
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Video {
+  id            String   @id @default(uuid())
+  name          String
+  path          String
+  transcription String?
+  createdBy     User     @relation(fields: [createdUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdUserId String
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+  updatedAt     DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([createdUserId])
+}
+
 model User {
   id               String    @id @default(cuid())
   name             String?
@@ -51,12 +73,13 @@ model User {
   isActive         Boolean   @default(false)
   accounts         Account[]
   sessions         Session[]
+  videos           Video[]
+  createdAt        DateTime  @default(now()) @map(name: "created_at")
+  updatedAt        DateTime  @updatedAt @map(name: "updated_at")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+model Prompt {
+  id       String @id @default(uuid())
+  title    String
+  template String
 }

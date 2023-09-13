@@ -1,4 +1,5 @@
 "use client";
+import LogoutBtn from "@/components/logout-btn";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -28,7 +29,9 @@ export default function DashboardSubscription({
     return (
       <section className="flex min-h-screen items-center">
         {/* Include shared UI here e.g. a header or sidebar */}
-        <nav></nav>
+        <nav>
+          <LogoutBtn/>
+        </nav>
 
         {children}
       </section>

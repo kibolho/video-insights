@@ -1,5 +1,5 @@
 "use client";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default function LoginBtn() {
   useEffect(() => {
     if (status === "authenticated") {
       if (!session?.user?.isActive) {
-        return router.push("/subscription");
+        return router.push("/dashboard");
       }
       return router.push("/dashboard");
     }
@@ -27,7 +27,7 @@ export default function LoginBtn() {
       <>
         <button
           className={baseBtnStyle}
-          onClick={() => signIn("google", { callbackUrl: "/subscription" })}
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
         >
           Sign in
         </button>
