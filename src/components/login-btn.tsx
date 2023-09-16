@@ -19,7 +19,9 @@ export default function LoginBtn({ absolute = false, label="Sign In"}) {
   }, [status, session]);
 
   if (status === "loading") {
-    return <p>Loading...</p>
+    return <p className={
+      absolute ? "absolute right-4 top-4 md:right-8 md:top-8" : ""
+    }>Loading...</p>
   }
 
   if (status === "unauthenticated") {

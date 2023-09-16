@@ -6,10 +6,15 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest,res: NextResponse) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user?.id) 
-    return NextResponse.json({ error: "Unauthenticated" },{ status: 401 })
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.id) 
+      return NextResponse.json({ error: "Unauthenticated" },{ status: 401 })
 
-  const prompts = await prisma.prompt.findMany();
-  return NextResponse.json(prompts)
+    const prompts = await prisma.prompt.findMany();
+    return NextResponse.json(prompts)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: "Internal Server Error" },{ status: 500 })
+  }
 }

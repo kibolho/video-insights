@@ -30,7 +30,7 @@ export default function AuthenticationPage() {
                 helped me deliver stunning videos to my clients faster than
                 ever before.&rdquo;
               </p>
-              <footer className="text-sm">Sofia Davis</footer>
+              <footer className="text-sm">Famous youtuber in the near future</footer>
             </blockquote>
           </div>
         </div>

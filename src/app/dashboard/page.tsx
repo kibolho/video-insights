@@ -1,28 +1,40 @@
-'use client'
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Github } from "lucide-react";
+"use client";
+import { Alert } from "@/components/alert";
 import { PromptInputForm } from "@/components/prompt-input-form";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import VideoInputForm from "@/components/video-input-form";
 import { queryClient } from "@/lib/react-query";
-import { useState } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useCompletion } from "ai/react";
+import { useEffect, useState } from "react";
 export default function Dashboard() {
   const [temperature, setTemperature] = useState(0.5);
   const [videoId, setVideoId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const { input, setInput, handleInputChange, handleSubmit, completion, isLoading } = useCompletion({
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    completion,
+    isLoading,
+    error: aiError,
+  } = useCompletion({
     api: `${process.env.NEXT_PUBLIC_VERCEL_URL}/api/ai/complete`,
     body: {
       videoId,
       temperature,
     },
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
+
+  useEffect(() => {
+    if (aiError) setError(aiError.message ?? "Error desconhecido");
+  }, [aiError]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,16 +63,21 @@ export default function Dashboard() {
             </p>
           </div>
           <aside className="w-80 space-y-2">
-            <VideoInputForm onVideoUploaded={setVideoId} />
-            <Separator />
-            <PromptInputForm
-              promptSubmit={handleSubmit}
-              handlePromptSelect={setInput}
-              temperature={temperature}
-              setTemperature={setTemperature}
-              isLoading={isLoading}
-            />
+            <VideoInputForm setError={setError} onVideoSelected={setVideoId} videoId={videoId} />
+            {videoId && (
+              <>
+                <Separator />
+                <PromptInputForm
+                  promptSubmit={handleSubmit}
+                  handlePromptSelect={setInput}
+                  temperature={temperature}
+                  setTemperature={setTemperature}
+                  isLoading={isLoading}
+                />
+              </>
+            )}
           </aside>
+          <Alert error={error} setError={setError} />
         </main>
       </div>
     </QueryClientProvider>

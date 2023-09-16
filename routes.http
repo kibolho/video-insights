@@ -1,6 +1,11 @@
 # @name get-prompts
 GET http://localhost:3000/api/prompts
 
+### 
+
+# @name get-videos
+GET http://localhost:3000/api/videos
+
 ###
 
 # @name upload

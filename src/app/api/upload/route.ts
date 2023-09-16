@@ -8,9 +8,18 @@ import { randomUUID } from 'node:crypto';
 export async function POST(req: NextRequest,res: NextResponse) {
   try {
     const session = await getServerSession(authOptions);
-
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthenticated" },{ status: 401 })
+    }
+    const videoCount = await prisma.video.count({
+      where: {
+        createdBy: {
+          id: session.user?.id
+        }
+      }
+    })
+    if(videoCount > 2) {
+      return NextResponse.json({ error: "Você só pode enviar 2 vídeo na versão FREE, a versão PRO está a caminho!" },{ status: 400 })
     }
     const data = await req.formData()
     const file: File | null = data.get('file') as unknown as File
