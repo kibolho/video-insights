@@ -53,7 +53,7 @@ model VerificationToken {
 model Video {
   id            String   @id @default(uuid())
   name          String
-  path          String
+  path          String?
   transcription String?
   createdBy     User     @relation(fields: [createdUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdUserId String
