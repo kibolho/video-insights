@@ -1,0 +1,3 @@
+export const CODES = {
+  PRO_VERSION_REQUIRED: "PRO_VERSION_REQUIRED",
+}

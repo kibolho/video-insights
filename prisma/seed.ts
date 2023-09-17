@@ -55,6 +55,24 @@ Transcrição:
 '''`.trim()
     }
   })
+
+  await prisma.prompt.create({
+    data: {
+      title: 'Resumo Youtube',
+      template: `Seu papel é gerar um resumo sucinto para um vídeo do YouTube.
+  
+Abaixo você receberá uma transcrição desse vídeo, use essa transcrição para gerar o resumo.
+
+O resumo deve possuir no máximo 80 palavras contendo os pontos principais do vídeo.
+
+Use palavras chamativas e que cativam a atenção de quem está lendo.
+
+Transcrição:
+'''
+{transcription}
+'''`.trim()
+    }
+  })
 }
 
 main()

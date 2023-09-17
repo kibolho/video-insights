@@ -2,9 +2,15 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  const bodySchema = z.object({
+    productId: z.string(),
+  });
+  const { productId } = bodySchema.parse(body);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2022-11-15",
@@ -29,13 +35,13 @@ export async function POST(req: NextRequest) {
     customer: session.user.stripeCustomerId,
     line_items: [
       {
-        // temporarily hard coded price (subscription)
-        price: body,
+        price: productId,
         quantity: 1,
       },
     ],
-    success_url: process.env.NEXT_PUBLIC_VERCEL_URL + `?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  process.env.NEXT_PUBLIC_VERCEL_URL,
+    success_url:
+      req.nextUrl.origin + "/dashboard" + `?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: req.nextUrl.origin + "/dashboard",
     subscription_data: {
       metadata: {
         // so that we can manually check in Stripe for whether a customer has an active subscription later, or if our webhook integration breaks.

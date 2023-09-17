@@ -1,5 +1,7 @@
+import Script from "next/script";
 import Provider from "../components/provider";
 import "./globals.css";
+import Scripts from "@/components/Scripts";
 
 export const metadata = {
   title: "Create Next App",
@@ -13,10 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Scripts/>
       <body>
-        <Provider>
-            {children}
-        </Provider>
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

@@ -1,17 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/../prisma/prisma";
+import { authOptions } from "@/lib/auth";
 import { openai } from "@/lib/openai";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { randomUUID } from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { convertMP4AudioToMP3Audio } from "./convert";
+import { downloadYoutubeVideo } from "./download";
+import { createReadStream } from "fs";
 import { CODES } from "@/constants";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
+    const regex = /https:\/\/www\.youtube\.com\/shorts\/([^\/]+)\/?/;
+    const bodySchema = z.object({
+      shortsURL: z.string().url().regex(regex),
+    });
+    const body = await req.json();
+    const result = bodySchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+    }
+
     const videoCount = await prisma.video.count({
       where: {
         createdBy: {
@@ -29,34 +43,25 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 400 }
       );
     }
-    const data = await req.formData();
-    const file: File | null = data.get("file") as unknown as File;
-    const prompt = data.get("prompt") as unknown as string;
 
-    if (!file) {
-      return NextResponse.json({ error: "Arquivo não enviado" }, { status: 400 });
-    }
-
-    if (!(file.type === "audio/mpeg" || file.type === "audio/mp3")) {
-      return NextResponse.json(
-        { error: "Invalid file type, please upload a MP3" },
-        { status: 400 }
-      );
-    }
-    const name = `${randomUUID()}-${file.name}`;
-
+    const audioPath = "./tmp/audio.mp4";
+    const audioOutputPath = "./tmp/audio.mp3";
+    await downloadYoutubeVideo(body.shortsURL, audioPath);
+    await convertMP4AudioToMP3Audio(audioPath, audioOutputPath);
+    console.log("Enviando o audio...");
     const response = await openai.audio.transcriptions.create({
-      file,
+      file: createReadStream(audioOutputPath),
       model: "whisper-1",
       language: "pt",
       response_format: "json",
       temperature: 0,
-      prompt,
     });
+
+    const name = body.shortsURL;
     const transcription = response.text;
     const video = await prisma.video.create({
       data: {
-        name: name,
+        name,
         transcription,
         createdBy: {
           connect: {
@@ -65,7 +70,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
       },
     });
-
     return NextResponse.json({ video });
   } catch (error) {
     console.error(error);

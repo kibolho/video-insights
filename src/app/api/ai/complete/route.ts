@@ -28,7 +28,7 @@ export async function POST(req: NextRequest,res: NextResponse) {
       },
     })
     if(!video.transcription) {
-      return NextResponse.json({ error: "Video transcription was not generated yet." },{ status: 400 })
+      return NextResponse.json({ error: "Transcrição do vídeo não foi gerada ainda" },{ status: 400 })
     }
     const promptMessage = prompt.replace("{transcription}", video.transcription)
     const response = await openai.chat.completions.create({

@@ -1,11 +1,26 @@
+"use client";
+import { useRouter } from "next/navigation";
 import LoginBtn from "../components/login-btn";
-import Link from "next/link"
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { Spinner } from "@/components/spinner";
 
 export default function AuthenticationPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, session, router]);
+
+  if (status !== "unauthenticated") return <Spinner />;
   return (
     <>
       <div className="container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-        <LoginBtn absolute/>
+        <LoginBtn absolute />
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
@@ -26,11 +41,13 @@ export default function AuthenticationPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;This tool has saved me countless hours of work and
-                helped me deliver stunning videos to my clients faster than
-                ever before.&rdquo;
+                &ldquo;This tool has saved me countless hours of work and helped
+                me deliver stunning videos to my clients faster than ever
+                before.&rdquo;
               </p>
-              <footer className="text-sm">Famous youtuber in the near future</footer>
+              <footer className="text-sm">
+                Famous youtuber in the near future
+              </footer>
             </blockquote>
           </div>
         </div>
@@ -52,7 +69,7 @@ export default function AuthenticationPage() {
               </Link>{" "}
               and{" "}
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Privacy Policy
@@ -63,5 +80,5 @@ export default function AuthenticationPage() {
         </div>
       </div>
     </>
-  )
+  );
 }

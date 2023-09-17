@@ -1,18 +1,18 @@
 "use client";
-import { Alert } from "@/components/alert";
 import { PromptInputForm } from "@/components/prompt-input-form";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import VideoInputForm from "@/components/video-input-form";
+import { useAlert } from "@/contexts/alert-context";
 import { queryClient } from "@/lib/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useCompletion } from "ai/react";
 import { useEffect, useState } from "react";
+
 export default function Dashboard() {
   const [temperature, setTemperature] = useState(0.5);
   const [videoId, setVideoId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
+  const { setAlert } = useAlert();
   const {
     input,
     setInput,
@@ -33,8 +33,9 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    if (aiError) setError(aiError.message ?? "Error desconhecido");
-  }, [aiError]);
+    if (aiError)
+      setAlert({ description: aiError.message ?? "Error desconhecido" });
+  }, [aiError, setAlert]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,7 +64,7 @@ export default function Dashboard() {
             </p>
           </div>
           <aside className="w-80 space-y-2">
-            <VideoInputForm setError={setError} onVideoSelected={setVideoId} videoId={videoId} />
+            <VideoInputForm onVideoSelected={setVideoId} videoId={videoId} />
             {videoId && (
               <>
                 <Separator />
@@ -77,7 +78,6 @@ export default function Dashboard() {
               </>
             )}
           </aside>
-          <Alert error={error} setError={setError} />
         </main>
       </div>
     </QueryClientProvider>

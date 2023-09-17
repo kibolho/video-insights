@@ -1,6 +1,7 @@
+"use client";
+import { useAlert } from "@/contexts/alert-context";
 import { api } from "@/lib/axios";
-import { getFFmpeg } from "@/lib/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
+import { convertVideoToAudio } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { FileVideo, Upload } from "lucide-react";
 import React, {
@@ -10,10 +11,9 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Divider } from "./divider";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
-import { Textarea } from "./ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Textarea } from "./ui/textarea";
+import VideoYoutubeInputForm from "./video-youtube-input-form";
+import { uploadAudio } from "@/services/upload";
+import { CODES } from "@/constants";
+import { handleCreateCheckoutSession } from "@/services/pay";
+
 interface Video {
   id: string;
   name: string;
@@ -32,7 +38,7 @@ interface Video {
 }
 
 type Status = "waiting" | "converting" | "transcribing" | "success" | "error";
-type VideoType = "old" | "new";
+type VideoType = "old" | "new" | "youtube";
 
 const statusMessages = {
   converting: "Convertendo...",
@@ -42,20 +48,20 @@ const statusMessages = {
 };
 
 interface Props {
-  setError: (error: string | null) => void;
   onVideoSelected: (videoId: string | null) => void;
   videoId: string | null;
 }
 
-const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId }) => {
+const VideoInputForm: React.FC<Props> = ({ onVideoSelected, videoId }) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoType, setVideoType] = useState<VideoType | null>(null);
   const [status, setStatus] = useState<Status>("waiting");
   const promptInputRef = useRef<HTMLTextAreaElement>(null);
+  const { setAlert } = useAlert();
 
   const { isLoading, data } = useQuery<Video[]>({
     queryKey: ["videos"],
-    queryFn: () => api.get("/api/videos").then((response) => response.data),
+    queryFn: () => api().get("/api/videos").then((response) => response.data),
   });
 
   const handleFileSelected = (event: ChangeEvent<HTMLInputElement>) => {
@@ -73,37 +79,6 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId })
     return URL.createObjectURL(videoFile);
   }, [videoFile]);
 
-  const convertVideoToAudio = async (video: File) => {
-    console.log("Converting video to audio");
-    const ffmpeg = await getFFmpeg();
-    await ffmpeg.writeFile("input.mp4", await fetchFile(video));
-    ffmpeg.on("progress", (progress) => {
-      console.log("Convert progress: " + Math.round(progress.progress * 100));
-    });
-    ffmpeg.on("log", (log) => {
-      console.log(log);
-    });
-    const audioName = `${video.name}.mp3`;
-    await ffmpeg.exec([
-      "-i",
-      "input.mp4",
-      "-map",
-      "0:a",
-      "-b:a",
-      "20k",
-      "-acodec",
-      "libmp3lame",
-      audioName,
-    ]);
-
-    const data = await ffmpeg.readFile(audioName);
-    const audioFileBlob = new Blob([data], { type: "audio/mpeg" });
-    const audioFile = new File([audioFileBlob], audioName, {
-      type: "audio/mpeg",
-    });
-    console.log("Finished converting video to audio");
-    return audioFile;
-  };
   const handleUploadVideo = async (event: FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
@@ -112,16 +87,22 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId })
       setStatus("converting");
       const audioFile = await convertVideoToAudio(videoFile);
       setStatus("transcribing");
-      const data = new FormData();
-      data.append("file", audioFile);
-      data.append("prompt", prompt);
-      const responseVideos = await api.post("/api/upload", data);
-      const videoId = responseVideos.data.video.id;
+      const videoId = await uploadAudio(audioFile, prompt);
       setStatus("success");
       onVideoSelected(videoId);
     } catch (error: any) {
-      setError(error?.response?.data?.error ?? "Erro desconhecido");
       setStatus("waiting");
+      const bodyResponse = error?.response?.data;
+      if (bodyResponse.code === CODES.PRO_VERSION_REQUIRED)
+        return setAlert({
+          title: "Seja PRO",
+          description: bodyResponse.error,
+          actionLabel: "Assinar",
+          onAction: handleCreateCheckoutSession,
+        });
+      setAlert({
+        description: bodyResponse.error ?? "Erro desconhecido",
+      });
     }
   };
   return (
@@ -155,18 +136,12 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId })
           />
         </>
       )}
-      {!videoType && (
-        <div className="flex items-center w-full">
-          <div className="w-full border-t border-gray-300"></div>
-          <span className="mx-3 text-muted-foreground">ou</span>
-          <div className="w-full border-t border-gray-300"></div>
-        </div>
-      )}
+      {!videoType && <Divider />}
       {(!videoType || videoType === "old") && (
         <Select
-          value={(!videoType || !videoId) ? undefined : videoId}
+          value={!videoType || !videoId ? undefined : videoId}
           onValueChange={(id) => {
-            if (!!id && id!="none") {
+            if (!!id && id != "none") {
               setVideoType("old");
               onVideoSelected(id);
             }
@@ -194,6 +169,15 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId })
           </SelectContent>
         </Select>
       )}
+      {!videoType && <Divider />}
+      {(!videoType || videoType === "youtube") && (
+        <VideoYoutubeInputForm
+          onVideoSelected={(id) => {
+            setVideoType("youtube");
+            onVideoSelected(id);
+          }}
+        />
+      )}
       {videoType && (
         <Button
           variant="outline"
@@ -201,7 +185,7 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, setError, videoId })
           onClick={() => {
             setVideoType(null);
             onVideoSelected(null);
-            setVideoFile(null)
+            setVideoFile(null);
           }}
         >
           Reset

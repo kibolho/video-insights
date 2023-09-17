@@ -1,32 +1,52 @@
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
-import React from 'react';
+import React from "react";
 
-interface Props {
-  error: string | null
-  setError: (error: string | null) => void
+export interface AlertProps {
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  description: string;
+  onAction?: () => void;
+  actionLabel?: string;
 }
-export const Alert: React.FC<Props> = ({error,setError}) => {
-  return <AlertDialog open={!!error}>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Ops! Tivemos um problema</AlertDialogTitle>
-      <AlertDialogDescription>
-        {error}
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel onClick={()=>setError(null)}>Ok</AlertDialogCancel>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-}
-
+export const Alert: React.FC<AlertProps> = ({
+  open,
+  title = "Ops! Tivemos um problema",
+  description,
+  onClose,
+  onAction,
+  actionLabel,
+}) => {
+  return (
+    <AlertDialog open={open}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={onClose}>Ok</AlertDialogCancel>
+          {actionLabel && onAction && (
+            <AlertDialogAction
+              onClick={() => {
+                onAction();
+                onClose();
+              }}
+            >
+              {actionLabel}
+            </AlertDialogAction>
+          )}
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
