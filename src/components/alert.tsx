@@ -17,6 +17,7 @@ export interface AlertProps {
   description: string;
   onAction?: () => void;
   actionLabel?: string;
+  cancelLabel?: string;
 }
 export const Alert: React.FC<AlertProps> = ({
   open,
@@ -25,6 +26,7 @@ export const Alert: React.FC<AlertProps> = ({
   onClose,
   onAction,
   actionLabel,
+  cancelLabel = "Ok",
 }) => {
   return (
     <AlertDialog open={open}>
@@ -34,7 +36,7 @@ export const Alert: React.FC<AlertProps> = ({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Ok</AlertDialogCancel>
+          <AlertDialogCancel onClick={onClose}>{cancelLabel}</AlertDialogCancel>
           {actionLabel && onAction && (
             <AlertDialogAction
               onClick={() => {

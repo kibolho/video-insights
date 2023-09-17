@@ -99,6 +99,7 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, videoId }) => {
           description: bodyResponse.error,
           actionLabel: "Assinar",
           onAction: handleCreateCheckoutSession,
+          cancelLabel: "Agora não",
         });
       setAlert({
         description: bodyResponse.error ?? "Erro desconhecido",
@@ -117,7 +118,7 @@ const VideoInputForm: React.FC<Props> = ({ onVideoSelected, videoId }) => {
               <video
                 src={previewURL}
                 controls={false}
-                className="pointer-events-none absolute inset-0"
+                className="pointer-events-none relative inset-0"
               />
             ) : (
               <>

@@ -4,8 +4,6 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import VideoInputForm from "@/components/video-input-form";
 import { useAlert } from "@/contexts/alert-context";
-import { queryClient } from "@/lib/react-query";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { useCompletion } from "ai/react";
 import { useEffect, useState } from "react";
 
@@ -38,8 +36,7 @@ export default function Dashboard() {
   }, [aiError, setAlert]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen flex flex-col">
+      <div className="flex flex-col flex-1">
         <main className="flex flex-1 p-6 gap-6">
           <div className="flex flex-col flex-1 gap-4">
             <div className="grid grid-row-2 gap-4 flex-1">
@@ -80,6 +77,5 @@ export default function Dashboard() {
           </aside>
         </main>
       </div>
-    </QueryClientProvider>
   );
 }

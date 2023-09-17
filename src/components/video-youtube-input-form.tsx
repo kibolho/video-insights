@@ -42,6 +42,7 @@ const VideoYoutubeInputForm: React.FC<Props> = ({ onVideoSelected }) => {
           description: bodyResponse.error,
           actionLabel: "Assinar",
           onAction: handleCreateCheckoutSession,
+          cancelLabel: "Agora não",
         });
       setAlert({
         description: bodyResponse.error ?? "Erro desconhecido",

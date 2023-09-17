@@ -24,7 +24,7 @@ export default function DashboardLayout({
 
   if (status !== "authenticated") return <Spinner />;
   return (
-    <section className="">
+    <section className="flex flex-col min-h-screen">
       {/* Include shared UI here e.g. a header or sidebar */}
       <nav className="px-6 py-3 flex items-center justify-between border-b">
         <h1 className="relative z-20 flex items-center text-lg font-medium">
