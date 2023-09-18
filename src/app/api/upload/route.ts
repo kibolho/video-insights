@@ -12,23 +12,23 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
-    const videoCount = await prisma.video.count({
-      where: {
-        createdBy: {
-          id: session.user?.id,
-        },
-      },
-    });
-    if (videoCount > 2) {
-      return NextResponse.json(
-        {
-          error:
-            "Você só pode enviar 2 vídeo na versão FREE, assine a versão PRO para enviando novos vídeos",
-          code: CODES.PRO_VERSION_REQUIRED,
-        },
-        { status: 400 }
-      );
-    }
+    // const videoCount = await prisma.video.count({
+    //   where: {
+    //     createdBy: {
+    //       id: session.user?.id,
+    //     },
+    //   },
+    // });
+    // if (videoCount > 2) {
+    //   return NextResponse.json(
+    //     {
+    //       error:
+    //         "Você só pode enviar 2 vídeo na versão FREE, assine a versão PRO para enviando novos vídeos",
+    //       code: CODES.PRO_VERSION_REQUIRED,
+    //     },
+    //     { status: 400 }
+    //   );
+    // }
     const data = await req.formData();
     const file: File | null = data.get("file") as unknown as File;
     const prompt = data.get("prompt") as unknown as string;
