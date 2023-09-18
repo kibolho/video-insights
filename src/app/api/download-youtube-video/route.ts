@@ -26,22 +26,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    const videoCount = await prisma.video.count({
-      where: {
-        createdBy: {
-          id: session.user?.id,
+    if (!session.user?.isActive) {
+      const videoCount = await prisma.video.count({
+        where: {
+          createdBy: {
+            id: session.user?.id,
+          },
         },
-      },
-    });
-    if (videoCount > 2) {
-      return NextResponse.json(
-        {
-          error:
-            "Você só pode enviar 2 vídeo na versão FREE, assine a versão PRO para enviando novos vídeos",
-          code: CODES.PRO_VERSION_REQUIRED,
-        },
-        { status: 400 }
-      );
+      });
+      if (videoCount > 2) {
+        return NextResponse.json(
+          {
+            error:
+              "Você só pode enviar 2 vídeo na versão FREE, assine a versão PRO para enviando novos vídeos",
+            code: CODES.PRO_VERSION_REQUIRED,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const audioPath = "./tmp/audio.mp4";
