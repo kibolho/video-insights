@@ -1,11 +1,8 @@
-# upload.ai (Next.js, Next-Auth, Prisma, Stripe)
+# Video Insights (Next.js, Next-Auth, Prisma, Stripe)
 
-## Run Stripe Locally
+Application that allows uploading videos (file or youtube links) and through AI, automatically create catchy titles, descriptions and summaries with good indexing.
 
-stripe login
-stripe listen --forward-to localhost:3000/webhook
-stripe trigger customer.subscription.created
-stripe trigger customer.subscription.deleted
+<img src=".github/vi-dashboard.png">
 
 ## Run The Project Locally
 
@@ -25,6 +22,14 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+
+## Run Stripe Locally
+
+stripe login
+stripe listen --forward-to localhost:3000/webhook
+stripe trigger customer.subscription.created
+stripe trigger customer.subscription.deleted
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -34,6 +39,7 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 - [Inspiration Post](https://dev.to/nicolas_bastida/how-to-add-authentication-with-subscriptions-into-your-nextjs-app-website-1513)
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
